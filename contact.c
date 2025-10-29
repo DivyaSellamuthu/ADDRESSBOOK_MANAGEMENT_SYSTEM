@@ -4,6 +4,10 @@
 #include "contact.h"
 #include "file.h"
 #include "populate.h"
+
+// Utility function: Compares strings (name/phone/email) to find matching contact.
+// Returns index if match found; -1 if not found.
+
 int comparing_strings(AddressBook *addressBook,char *str,int choice)
 {
     for(int i=0;i<addressBook->contactCount;i++){
@@ -26,6 +30,7 @@ int comparing_strings(AddressBook *addressBook,char *str,int choice)
         return -1;
         
 }
+
 void listContacts(AddressBook *addressBook) 
 {
     int size=addressBook->contactCount;
@@ -58,6 +63,7 @@ void initialize(AddressBook *addressBook) {
     //populateAddressBook(addressBook);
     
     // Load contacts from file during initialization (After files)
+    // Displays sorted contact list alphabetically by name for better readability.
     loadContactsFromFile(addressBook);
 }
 
@@ -79,7 +85,7 @@ void createContact(AddressBook *addressBook)
             scanf(" %s",phone);
             len=strlen(phone);
             if(len!=10){
-
+                // Validate phone number: must be 10 digits and contain only numeric characters.
                 printf("Enter the 10 digit number⚠️\n");
                 continue;
             }
@@ -94,6 +100,7 @@ void createContact(AddressBook *addressBook)
                 printf("Enter only digits⚠️!!\n");
                 continue;
             }
+            //Validation: Prevent duplicate phone numbers.
             index=comparing_strings(addressBook,phone,2);
             if((index!=-1)){
                 printf("Contact exist⚠️! Enter the correct number\n");
@@ -106,6 +113,7 @@ void createContact(AddressBook *addressBook)
             printf("✍️  Enter your email 📩 id : ");
             scanf(" %s",email);
             int len=strlen(email);
+            // Validate email format: must include '@' and '.com', start with lowercase, no capitals or invalid symbols.
              if((strchr(email,'@')==NULL)||(strstr(email,".com")==NULL)){
                 printf("Enter a valid mail id⚠️\n");
                 continue;
@@ -135,9 +143,11 @@ void createContact(AddressBook *addressBook)
                 printf("Oops☹️! Start with a lowercase 🔡 and avoid capitals ❌ , special symbols except @ and . in your email. Try again.\n");
                 continue;
             }
+            //Validation: Prevent duplicate email IDs.
+
             index=comparing_strings(addressBook,email,3);
             if(index!=-1){
-                printf("Mail id exist⚠️!\n");
+                printf("Mail id exist⚠️ Enter the correct mail id!\n");
                 continue;
                 }
             break;
@@ -158,6 +168,7 @@ void searchContact(AddressBook *addressBook)
     int size=addressBook->contactCount;
     char name[50],phone[20],email[20];
     do{
+    // Validate search input based on user choice (name, phone, or email).
     printf("1.🔍 search by name\n2.🔍 search by phone number\n3.🔍 search by email\n4.🔚 Exit\n");
     printf("✍️  Enter your choice: ");
     scanf(" %d",&choice);
@@ -166,6 +177,7 @@ void searchContact(AddressBook *addressBook)
         printf("Enter Name 🔍: ");
         scanf(" %[^\n]",name);
         index=comparing_strings(addressBook,name,choice);
+        
         if(index!=-1){
             printf("----------------------------------------------------------------------------------\n");
             printf("%-6s %-35s %-15s %-30s\n", "SL.No", "Name", "Phone", "Email");
@@ -178,11 +190,12 @@ void searchContact(AddressBook *addressBook)
             printf("----------------------------------------------------------------------------------\n");
         }
         else{
-            printf("Contact not found ⚠️\n");
+            printf("Contact not found ⚠️\n");// Displays 'Contact not found' for invalid or non-existent entries.
         }
         break;
         case 2:
         flag=0;
+        // Ensures phone number entered during search is valid (10 digits, numeric only).
         do{
         printf("Enter phone number 🔍: ");
         scanf(" %s",phone);
@@ -236,13 +249,12 @@ void searchContact(AddressBook *addressBook)
         case 4:
         break;
         default:
-        printf("Invalid Choice 🚫. please try again!\n");
+        printf("Invalid Choice 🚫. please try again!\n");//This gets printed if the user enters the invalid choice
     }
     
     
 }while(choice!=4);
-    
-    
+        
 }
 
 void editContact(AddressBook *addressBook)
@@ -267,6 +279,7 @@ void editContact(AddressBook *addressBook)
             flag1=0;
 
             int temp=0;
+            // Validation: Checks if contact exists before editing.
             for(int i=0;i<size;i++){
                 if(strcasecmp(addressBook->contacts[i].name,name)==0){
                     temp+=1;
@@ -299,14 +312,13 @@ void editContact(AddressBook *addressBook)
                     }
                 }
                 printf("----------------------------------------------------------------------------------\n");
+                // Validations: If multiple contacts share the same name, allows user to choose via serial number.
                 do{
                     printf("Enter the serial number of the contact u want to edit ✏️  : ");
                     scanf("%d",&serial_no);
                     getchar();
-                    flag=0;
-                    //if(serial_no>=0&&serial_no<size){
-                        
-                        for(int i=0;i<match_count;i++){
+                    flag=0;                        
+                    for(int i=0;i<match_count;i++){
                             if(count[i]==serial_no){
                                 printf("✍️  Enter New Name: ");
                                 scanf(" %[^\n]",name);
@@ -340,6 +352,7 @@ void editContact(AddressBook *addressBook)
                     scanf(" %s",new_phone);
                     int len=strlen(new_phone);
                     flag1=1;
+                    // Validations: Ensures new phone number follows 10-digit rule and is not duplicate.
                     if(len!=10){
                         printf("Enter the 10 digit number ⚠️\n");
                         flag1=0;
@@ -387,6 +400,7 @@ void editContact(AddressBook *addressBook)
                 flag1=0;
                 flag2=0;
                 char new_email[20];
+                //Validations: Ensures new email follows correct format and is unique.
                 printf("✍️  Enter New Email id 📩: ");
                 scanf(" %s",new_email);
                 int len=strlen(new_email);
@@ -445,7 +459,7 @@ void editContact(AddressBook *addressBook)
         case 4:
         break;
         default:
-        printf("Invalid Choice 🚫. please try again!\n");
+        printf("Invalid Choice 🚫. please try again!\n");//This gets printed if the user enters the invalid choice
     }
 }while(edit_choice!=4);
     
@@ -473,11 +487,13 @@ void deleteContact(AddressBook *addressBook)
             scanf(" %[^\n]",name);
             flag1=0;
             int temp=0;
+            // Validation: Ensures contact exists before deletion.
             for(int i=0;i<addressBook->contactCount;i++){
                 if(strcasecmp(addressBook->contacts[i].name,name)==0){
                     temp+=1;
                 }
             }
+            // Prevents deletion of non-existent contacts.
             if(temp==0){
                 printf("Contact not found,enter the correct one ⚠️\n" );
             }
@@ -506,13 +522,13 @@ void deleteContact(AddressBook *addressBook)
                     }
                 }
                 printf("----------------------------------------------------------------------------------\n");
+                // Handles multiple contacts with same name using serial number confirmation.
                 do{
                     printf("Enter the serial number of the contact to be deleted 🗑️: ");
                     scanf("%d",&serial_no);
                     getchar();
                     flag=0;
-                    if(serial_no>=0&&serial_no<addressBook->contactCount){
-                        for(int i=0;i<match_count;i++){
+                    for(int i=0;i<match_count;i++){
                             if(count[i]==serial_no){
                                 for(int i=serial_no;i<addressBook->contactCount-1;i++){
                                     addressBook->contacts[i]=addressBook->contacts[i+1];
@@ -526,8 +542,9 @@ void deleteContact(AddressBook *addressBook)
                         }
                         if(flag==0){
                             printf("You have entered the wrong serial number 🚫\n");
+                            continue;
                         }
-                    }
+                    
             }while(flag==0);
             
         }
@@ -535,6 +552,7 @@ void deleteContact(AddressBook *addressBook)
     break;
         case 2:
         do{
+            flag=0;
             printf("Enter the phone number to be deleted 🗑️: ");
             scanf(" %s",phone);
             index=comparing_strings(addressBook,phone,choice);
@@ -555,6 +573,7 @@ void deleteContact(AddressBook *addressBook)
         break;
         case 3:
          do{
+            flag=0;
             printf("Enter the Email id to be deleted 🗑️: ");
             scanf(" %s",email);
             index=comparing_strings(addressBook,email,choice);
@@ -575,7 +594,7 @@ void deleteContact(AddressBook *addressBook)
         case 4:
         break;
         default:
-        printf("Invalid Choice 🚫. please try again!\n");
+        printf("Invalid Choice 🚫. please try again!\n");//This gets printed if the user enters the invalid choice
     
     }
 }while(choice!=4);
